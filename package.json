@@ -1,0 +1,26 @@
+{
+  "name": "weather-tddjs",
+  "version": "0.0.0",
+  "description": "Weather Service",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/larsthorup/weather-tddjs.git"
+  },
+  "author": "Lars Thorup",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/larsthorup/weather-tddjs/issues"
+  },
+  "homepage": "https://github.com/larsthorup/weather-tddjs",
+  "devDependencies": {
+    "grunt": "~0.4.4",
+    "grunt-contrib-jasmine": "~0.6.3"
+  }
+}
