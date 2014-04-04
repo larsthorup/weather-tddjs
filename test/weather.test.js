@@ -1,5 +1,14 @@
 describe('weather', function () {
-    it('works', function () {
-        expect(2+2).toBe(4);
+    it('renders', function () {
+
+        // given
+        var context = $('<div></div>');
+        var weatherData = { text: 'rain' };
+
+        // when
+        render(context, weatherData);
+
+        // then
+        expect(context.find('p').text()).toBe('rain');
     });
 });
