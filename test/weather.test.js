@@ -17,9 +17,15 @@ describe('weather', function () {
         // given
         $.mockjax({
             logging: false,
-            url: '/weather',
-            data: {query: 'Denver'},
-            responseText: {text: 'sun'},
+            url: 'http://api.openweathermap.org/data/2.5/weather',
+            data: {q: 'Denver'},
+            responseText: {
+                weather: [
+                    {
+                        description: 'sun'
+                    }
+                ]
+            },
             responseTime: 1
         });
 
