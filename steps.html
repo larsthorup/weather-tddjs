@@ -1,0 +1,320 @@
+<html>
+<body>
+
+<h1>Test-Driven Weather App in JavaScript - Step by Step</h1>
+
+<h2>Introduction</h2>
+<p>This document is a step-by-step guide in doing Test-Driven Development and Continuous Integration for front-end JavaScript with Grunt, Jasmine, PhantomJS and Travis-CI</p>
+<p>We will build a simple web page that can display the current weather at a user specified location.</p>
+<p>The overall steps will be:</p>
+<ol>
+    <li>Set up your machine</li>
+    <li>Set up a new project</li>
+    <li>Feature 1 - display weather data</li>
+    <li>Set up CI server</li>
+    <li>Feature 2 - fetch weather data</li>
+    <li>Produce code coverage report</li>
+    <li>Feature 3 - get location</li>
+</ol>
+
+
+<h2>Set up your machine</h2>
+<p>Install NodeJS from <a href="nodejs.org">nodejs.org</a></p>
+<p>Then install Grunt by running the following shell command:</p>
+<pre>
+    npm install -g grunt-cli
+</pre>
+
+
+<h2>Set up a new project</h2>
+<p>Create an empty folder for the project</p>
+<p>Configure the project to use npm by creating the file "package.json":</p>
+<pre>
+    {
+      "name": "weather",
+      "version": "0.0.0",
+      "description": "Weather",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/yourname/yourrepo"
+      },
+      "author": "Your Name"
+    }
+</pre>
+<p>Configure the project to use Grunt and Jasmine with Phantom by running the following commands:</p>
+<pre>
+    npm install grunt --save-dev
+    npm install grunt-contrib-jasmine --save-dev
+</pre>
+<p>Configure Grunt by creating the file "Gruntfile.js":</p>
+<pre>
+    module.exports = function (grunt) {
+        var gruntConfig = {};
+        // add plugin configuration here
+        grunt.initConfig(gruntConfig);
+    };
+</pre>
+<p>Create an almost empty web page which will be our application: "src/index.html"</p>
+<pre>
+    &lt;html>
+    &lt;head>
+        &lt;title>Weather&lt;/title>
+        &lt;script src="weather.js">&lt;/script>
+    &lt;/head>
+    &lt;body>
+        &lt;h1>Weather&lt;/h1>
+    &lt;/body>
+    &lt;/html>
+</pre>
+<p>Create an empty JavaScript file: "src/weather.js"</p>
+<pre>
+    // add functionality here
+</pre>
+<p>Configure Jasmine by adding this part to "Gruntfile.js":</p>
+<pre>
+    grunt.loadNpmTasks('grunt-contrib-jasmine');
+    gruntConfig.jasmine = {
+        src: {
+            src: [
+                'src/**/*.js'
+            ],
+            options: {
+                specs: 'test/**/*.test.js',
+                keepRunner: true
+            }
+        }
+    };
+    grunt.registerTask('test', ['jasmine:src']);
+</pre>
+<p>Create a temporary test to verify that our setup works in "weather.test.js":</p>
+<pre>
+    describe('weather', function () {
+        it('can add', function () {
+            expect(2+2).toBe(5);
+        });
+    });
+</pre>
+<p>Run the test from the command line and see it fail:</p>
+<pre>
+    grunt test
+</pre>
+<p>Run the test in the browser and see it fail:</p>
+<pre>
+    open _SpecRunner.html
+</pre>
+<p>Fix the test and rerun the test to see it pass:</p>
+<pre>
+    expect(2+2).toBe(4);
+</pre>
+
+
+
+<h2>Feature 1 - display weather data</h2>
+<p>We will display weather data by creating HTML markup and insert it into the DOM. We will start with the test in "weather.test.js":</p>
+<pre>
+    it('renders', function () {
+        // given
+        // when
+        // then
+    });
+</pre>
+<p>Let's start with what we want: the "then"-part: in our DOM context we expect to find a p-tag with the text "rain":</p>
+<pre>
+    expect(context.find('p').text()).toBe('rain');
+</pre>
+<p>We can only hope to have this test pass if we do something: the "when"-part: let's call our soon-to-be render()-method telling it were to render and the data to render from:</p>
+<pre>
+    render(context, weatherData);
+</pre>
+<p>We can also only hope to have this test pass if we prepare the context and the weather data: the "given"-part:</p>
+<pre>
+    var context = $('&lt;div>&lt;/div>');
+    var weatherData = { text: 'rain' };
+</pre>
+<p>As we are now using jQuery, we need to download jQuery-2.1.0.js and put in a src/lib folder.</p>
+<p>We need to tell grunt-jasmine to load jQuery. We do that by adding a vendor property next to the specs property in "Gruntfile.js":</p>
+<pre>
+    vendor: [
+        'src/lib/**/*.js',
+    ]
+</pre>
+<p>Now we need to write the code to make the test pass. We can add this to "weather.js":</p>
+<pre>
+    function render(context, data) {
+        $('&lt;p>&lt;/p>').appendTo(context).text(data.text);
+    }
+</pre>
+<p>To make our demo page show this feature, we first need to include jQuery in "index.html":</p>
+<pre>
+    &lt;script src="lib/jquery-2.1.0.js">&lt;/script>
+</pre>
+<p>Then we can call our new function when the page has loaded, also in "index.html":</p>
+<pre>
+    &lt;body onload="render($('body'), {text: 'cloudy'})">
+</pre>
+
+
+<h2>Feature 2 - fetch weather data</h2>
+<p>We will be fetching live weather data from <a href="openweathermap.org">openweathermap.org</a>, which returns weather data in <a href="http://bugs.openweathermap.org/projects/api/wiki/Weather_Data">JSON format</a>.</p>
+<p>Let's start with a test in "weather.test.js":</p>
+<pre>
+    it('fetches', function (done) {
+        // given
+        // when
+        // then
+    });
+</pre>
+<p>Since AJAX requests are asynchronous, we expect our function to return a promise with the data, so let's express that in the "then"-part:</p>
+<pre>
+    fetching.then(function (data) {
+        expect(data.text).toBe('sun');
+        done();
+    });
+</pre>
+<p>Calling done() is how we tell Jasmine that our asynchronous test has finished.</p>
+<p>For this to work we will need to call our fetch()-method: in the "when"-part:</p>
+<pre>
+    var fetching = fetch('Denver');
+</pre>
+<p>However, we don't want our unit test to actually call openweathermap.com. It will be slow, and it will not always return sunny weather. So in the "given"-part let's mock the AJAX call:</p>
+<pre>
+    $.mockjax({
+        url: 'http://api.openweathermap.org/data/2.5/weather',
+        data: {q: 'Denver'},
+        responseText: {
+            weather: [
+                {
+                    description: 'sun'
+                }
+            ]
+        }
+    });
+</pre>
+<p>Here we are using the popular mockjax plugin for jQuery to specify what JSON to return when our code performs a matching AJAX request.</p>
+<p>We need to download jquery.mockjax.js version 1.5.3 from <a href="https://github.com/appendto/jquery-mockjax">github.com/appendto/jquery-mockjax</a> and put it in a test/lib folder.</p>
+<p>We then need to tell Jasmine to also load jquery.mockjax.js, by expanding the vendor property in "Gruntfile.js":</p>
+<pre>
+    vendor: [
+        'src/lib/**/*.js',
+        'test/lib/**/*.js'
+    ]
+</pre>
+<p>Attempting to run the tests now will show this test as failing, so let's write some code to request the data and transform it to our needs in "weather.js":</p>
+<pre>
+    function fetch(query) {
+        return $.ajax({
+            url: 'http://api.openweathermap.org/data/2.5/weather',
+            data: {q: query},
+            dataType: 'jsonp'
+        }).then(function (data) {
+            return {
+                text: data.weather[0].description
+            };
+        });
+    }
+</pre>
+
+<h2>Produce code coverage report</h2>
+<p>When using the grunt-jasmine plugin, it is very easy to also get a code coverage report showing us exactly which code lines are covered by tests using the Istanbul code coverage tool.</p>
+<p>First, we need to add the grunt-jasmine-istanbul plugin, by running this command:</p>
+<pre>
+    npm install grunt-template-jasmine-istanbul --save-dev
+</pre>
+<p>Then we need to configure the plugin in "Gruntfile.js", by adding:</p>
+<pre>
+    gruntConfig.jasmine.istanbul = {
+        src: gruntConfig.jasmine.src.src,
+        options : {
+            specs: gruntConfig.jasmine.src.options.specs,
+            vendor: gruntConfig.jasmine.src.options.vendor,
+            template: require('grunt-template-jasmine-istanbul'),
+            templateOptions: {
+                coverage: 'output/coverage/coverage.json',
+                report: [
+                    {type: 'text-summary'},
+                    {type: 'html', options: {dir: 'output/coverage'}},
+                    {type: 'cobertura', options: {dir: 'output/cobertura'}}
+                ]
+            }
+        }
+    };
+    grunt.registerTask('cover', ['jasmine:istanbul']);
+</pre>
+<p>To make sure we don't include all the jQuery source code in the code coverage calculation, we must modify the src property of the jasmine configuration, also in "gruntfile.js":</p>
+<pre>
+    src: [
+        'src/**/*.js',
+        '!src/lib/*.js',
+    ],
+</pre>
+<p>You can now produce a code coverage report by running:</p>
+<pre>
+    grunt cover
+</pre>
+<p>And view the report with:</p>
+<pre>
+    open output/coverage/index.html
+</pre>
+
+
+
+<h2>Feature 3 - get location</h2>
+<p>We really want to let the user specify the location to show weather data for. Let's start with a test in "weather.test.js":</p>
+<pre>
+    it('listens', function () {
+        // given
+        // when
+        // then
+    });
+</pre>
+<p>We expect this feature to tie the two previous features together. So we expect something like this to happen, the "then"-part:</p>
+<pre>
+    expect(fetch).toHaveBeenCalledWith('San Francisco');
+    expect(render).toHaveBeenCalledWith(context, { text: 'foggy' });
+</pre>
+<p>The trigger of this will be that the user has changed an input value:</p>
+<pre>
+    listen(context);
+    city.val('San Francisco');
+    city.trigger('change');
+</pre>
+<p>In the "given"-section, we will need to create the DOM context for the test:</p>
+<pre>
+    var context = $('&lt;div>&lt;input type="text" id="city" />&lt;/div>');
+    var city = context.find('#city');
+</pre>
+<p>This is a unit test, so we don't actually want to invoke the fetch() and render() methods. Instead we use Jasmine to mock these methods, which also allows us to spy on them in the "then"-part.</p>
+<p>Note that mocking promises (then-ables) are not built into Jasmine, so we have to write a bit of boilerplate for that ourselves:</p>
+<pre>
+    spyOn(window, 'fetch').and.returnValue({
+        then: function(callback) {
+            callback({text: 'foggy'});
+        }
+    });
+    spyOn(window, 'render').and.returnValue();
+</pre>
+<p>Now that we have a failing test, we can implement the code in "weather.js" to make the test pass:</p>
+<pre>
+    function listen(context) {
+        context.find('#city').on('change', function () {
+            var city = $(this);
+            fetch(city.val()).then(function (data) {
+                render(context, data);
+            })
+        })
+    }
+</pre>
+<p>To show off we can now add an input element to our demo page, "index.html":</p>
+<pre>
+    &lt;label>
+        Location:
+        &lt;input type="text" id="city"/>
+    &lt;/label>
+</pre>
+<p>And call our new listen() method in onload:</p>
+<pre>
+    &lt;body onload="listen($('body'))">
+</pre>
+<p>And get weather reports :)</p>
+</body>
+</html>

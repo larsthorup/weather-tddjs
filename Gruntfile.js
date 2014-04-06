@@ -28,7 +28,7 @@ module.exports = function (grunt) {
             vendor: gruntConfig.jasmine.src.options.vendor,
             template: require('grunt-template-jasmine-istanbul'),
             templateOptions: {
-                coverage: 'bin/coverage/coverage.json',
+                coverage: 'output/coverage/coverage.json',
                 report: [
                     {type: 'text-summary'},
                     {type: 'html', options: {dir: 'output/coverage'}},
