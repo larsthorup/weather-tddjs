@@ -1,11 +1,27 @@
 <html>
 <body>
 
+
+<h1>ToDo</h1>
+
+<ol>
+    <li>Make a module, so we can do weather.listen</li>
+    <li>Setup a GitHub repo</li>
+    <li>Travis-CI</li>
+    <li>Print notes</li>
+    <li>Print JSON example</li>
+    <li>Commit markers</li>
+</ol>
+
 <h1>Test-Driven Weather App in JavaScript - Step by Step</h1>
 
 <h2>Introduction</h2>
 <p>This document is a step-by-step guide in doing Test-Driven Development and Continuous Integration for front-end JavaScript with Grunt, Jasmine, PhantomJS and Travis-CI</p>
 <p>We will build a simple web page that can display the current weather at a user specified location.</p>
+<p>We will assume that you already have some familiarity with JavaScript</p>
+
+<p>Note that many steps will require internet connection.</p>
+
 <p>The overall steps will be:</p>
 <ol>
     <li>Set up your machine</li>
@@ -19,8 +35,12 @@
 
 
 <h2>Set up your machine</h2>
-<p>Install NodeJS from <a href="nodejs.org">nodejs.org</a></p>
+<p>Install NodeJS from <a href="http://nodejs.org">nodejs.org</a></p>
 <p>Then install Grunt by running the following shell command:</p>
+<pre>
+    sudo npm install -g grunt-cli
+</pre>
+<p>On Windows you would run a Command Prompt as administrator and run the command without sudo:</p>
 <pre>
     npm install -g grunt-cli
 </pre>
@@ -70,7 +90,7 @@
 <pre>
     // add functionality here
 </pre>
-<p>Configure Jasmine by adding this part to "Gruntfile.js":</p>
+<p>Configure Jasmine by adding this part to "Gruntfile.js" (in place of the "// add plugin configuration here comment"):</p>
 <pre>
     grunt.loadNpmTasks('grunt-contrib-jasmine');
     gruntConfig.jasmine = {
@@ -138,13 +158,20 @@
         'src/lib/**/*.js',
     ]
 </pre>
+<p>To make sure we don't include jQuery twice, we must modify the src property of the jasmine configuration to exclude all libs, also in "gruntfile.js":</p>
+<pre>
+    src: [
+        'src/**/*.js',
+        '!src/lib/*.js',
+    ],
+</pre>
 <p>Now we need to write the code to make the test pass. We can add this to "weather.js":</p>
 <pre>
     function render(context, data) {
         $('&lt;p>&lt;/p>').appendTo(context).text(data.text);
     }
 </pre>
-<p>To make our demo page show this feature, we first need to include jQuery in "index.html":</p>
+<p>To make our demo page show this feature, we first need to reference jQuery in "index.html" above the weather.js reference:</p>
 <pre>
     &lt;script src="lib/jquery-2.1.0.js">&lt;/script>
 </pre>
@@ -220,7 +247,7 @@
 <pre>
     npm install grunt-template-jasmine-istanbul --save-dev
 </pre>
-<p>Then we need to configure the plugin in "Gruntfile.js", by adding:</p>
+<p>Then we need to configure the plugin in "Gruntfile.js", by adding this part after the jasmine configuration:</p>
 <pre>
     gruntConfig.jasmine.istanbul = {
         src: gruntConfig.jasmine.src.src,
@@ -239,13 +266,6 @@
         }
     };
     grunt.registerTask('cover', ['jasmine:istanbul']);
-</pre>
-<p>To make sure we don't include all the jQuery source code in the code coverage calculation, we must modify the src property of the jasmine configuration, also in "gruntfile.js":</p>
-<pre>
-    src: [
-        'src/**/*.js',
-        '!src/lib/*.js',
-    ],
 </pre>
 <p>You can now produce a code coverage report by running:</p>
 <pre>
@@ -272,7 +292,7 @@
     expect(fetch).toHaveBeenCalledWith('San Francisco');
     expect(render).toHaveBeenCalledWith(context, { text: 'foggy' });
 </pre>
-<p>The trigger of this will be that the user has changed an input value:</p>
+<p>The trigger of this will be that the user has changed an input value, so let's add this to the "when"-part:</p>
 <pre>
     listen(context);
     city.val('San Francisco');
@@ -284,7 +304,7 @@
     var city = context.find('#city');
 </pre>
 <p>This is a unit test, so we don't actually want to invoke the fetch() and render() methods. Instead we use Jasmine to mock these methods, which also allows us to spy on them in the "then"-part.</p>
-<p>Note that mocking promises (then-ables) are not built into Jasmine, so we have to write a bit of boilerplate for that ourselves:</p>
+<p>Note that mocking promises (then-ables) are not built into Jasmine, so we have to write a bit of boilerplate for that ourselves in the "given"-section:</p>
 <pre>
     spyOn(window, 'fetch').and.returnValue({
         then: function(callback) {
