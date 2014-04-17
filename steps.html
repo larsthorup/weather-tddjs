@@ -5,8 +5,8 @@
 <h1>ToDo</h1>
 
 <ol>
-    <li>Setup a GitHub repo</li>
     <li>Travis-CI</li>
+    <li>Setup a GitHub repo</li>
     <li>Print notes</li>
     <li>Print JSON example</li>
     <li>Commit markers</li>
@@ -26,7 +26,7 @@
     <li>Set up your machine</li>
     <li>Set up a new project</li>
     <li>Feature 1 - display weather data</li>
-    <li>Set up CI server</li>
+    <li>Set up Continuous Integration</li>
     <li>Feature 2 - fetch weather data</li>
     <li>Produce code coverage report</li>
     <li>Feature 3 - get location</li>
@@ -180,6 +180,29 @@
     &lt;body onload="Weather.render($('body'), {text: 'cloudy'})">
 </pre>
 
+
+<h2>Setup Continuous Intgeration</h2>
+<p>Note: this section assumes that your repository is on GitHub.</p>
+<p>We will be using Travis-CI which is free for open source projects, and work well with JavaScript projects</p>
+<p>First you need to enable Travis-CI for your GitHub repo. Follow the instructions <a href="http://docs.travis-ci.com/user/getting-started/">here</a>.</p>
+<p>Next step is to tell Travis-CI what platform our build system is running on. Here we use NodeJS, which Travis-CI supports out of the box.
+    We configure Travis-CI in a file in the root directory of your project, called .travis.yml. It should contain these instructions:</p>
+<pre>
+language: node_js
+node_js:
+  - 0.9
+</pre>
+<p>For build systems based on Node, Travis-CI will run the build with the command <code>npm test</code>.</p>
+<p>To make that command execute our grunt command, we need to extend the package.json file to look like this with the scripts section added:</p>
+<pre>
+    {
+      ...
+      "scripts": {
+        "test": "grunt test"
+      }
+    }
+</pre>
+<p>Now, whenever we commit and push changes to GitHub, Tracis-CI will run a build of our project</p>
 
 <h2>Feature 2 - fetch weather data</h2>
 <p>We will be fetching live weather data from <a href="openweathermap.org">openweathermap.org</a>, which returns weather data in <a href="http://bugs.openweathermap.org/projects/api/wiki/Weather_Data">JSON format</a>.</p>
