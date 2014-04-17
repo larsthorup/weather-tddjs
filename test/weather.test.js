@@ -7,7 +7,7 @@ describe('weather', function () {
         var weatherData = { text: 'rain' };
 
         // when
-        render(context, weatherData);
+        Weather.render(context, weatherData);
 
         // then
         expect(context.find('p').text()).toBe('rain');
@@ -30,7 +30,7 @@ describe('weather', function () {
         });
 
         // when
-        var fetching = fetch('Denver');
+        var fetching = Weather.fetch('Denver');
 
         // then
         fetching.then(function (data) {
@@ -43,20 +43,20 @@ describe('weather', function () {
         // given
         var context = $('<div><input type="text" id="city" /></div>');
         var city = context.find('#city');
-        spyOn(window, 'fetch').and.returnValue({
+        spyOn(Weather, 'fetch').and.returnValue({
             then: function(callback) {
                 callback({text: 'foggy'});
             }
         });
-        spyOn(window, 'render').and.returnValue();
+        spyOn(Weather, 'render').and.returnValue();
 
         // when
-        listen(context);
+        Weather.listen(context);
         city.val('San Francisco');
         city.trigger('change');
 
         // then
-        expect(fetch).toHaveBeenCalledWith('San Francisco');
-        expect(render).toHaveBeenCalledWith(context, { text: 'foggy' });
+        expect(Weather.fetch).toHaveBeenCalledWith('San Francisco');
+        expect(Weather.render).toHaveBeenCalledWith(context, { text: 'foggy' });
     });
 });

@@ -5,7 +5,6 @@
 <h1>ToDo</h1>
 
 <ol>
-    <li>Make a module, so we can do weather.listen</li>
     <li>Setup a GitHub repo</li>
     <li>Travis-CI</li>
     <li>Print notes</li>
@@ -86,8 +85,9 @@
     &lt;/body>
     &lt;/html>
 </pre>
-<p>Create an empty JavaScript file: "src/weather.js"</p>
+<p>Create a JavaScript file: "src/weather.js" with an empty Weather-module:</p>
 <pre>
+    Weather = {};
     // add functionality here
 </pre>
 <p>Configure Jasmine by adding this part to "Gruntfile.js" (in place of the "// add plugin configuration here comment"):</p>
@@ -144,7 +144,7 @@
 </pre>
 <p>We can only hope to have this test pass if we do something: the "when"-part: let's call our soon-to-be render()-method telling it were to render and the data to render from:</p>
 <pre>
-    render(context, weatherData);
+    Weather.render(context, weatherData);
 </pre>
 <p>We can also only hope to have this test pass if we prepare the context and the weather data: the "given"-part:</p>
 <pre>
@@ -167,7 +167,7 @@
 </pre>
 <p>Now we need to write the code to make the test pass. We can add this to "weather.js":</p>
 <pre>
-    function render(context, data) {
+    Weather.render = function (context, data) {
         $('&lt;p>&lt;/p>').appendTo(context).text(data.text);
     }
 </pre>
@@ -177,7 +177,7 @@
 </pre>
 <p>Then we can call our new function when the page has loaded, also in "index.html":</p>
 <pre>
-    &lt;body onload="render($('body'), {text: 'cloudy'})">
+    &lt;body onload="Weather.render($('body'), {text: 'cloudy'})">
 </pre>
 
 
@@ -201,7 +201,7 @@
 <p>Calling done() is how we tell Jasmine that our asynchronous test has finished.</p>
 <p>For this to work we will need to call our fetch()-method: in the "when"-part:</p>
 <pre>
-    var fetching = fetch('Denver');
+    var fetching = Weather.fetch('Denver');
 </pre>
 <p>However, we don't want our unit test to actually call openweathermap.com. It will be slow, and it will not always return sunny weather. So in the "given"-part let's mock the AJAX call:</p>
 <pre>
@@ -228,7 +228,7 @@
 </pre>
 <p>Attempting to run the tests now will show this test as failing, so let's write some code to request the data and transform it to our needs in "weather.js":</p>
 <pre>
-    function fetch(query) {
+    Weather.fetch = function (query) {
         return $.ajax({
             url: 'http://api.openweathermap.org/data/2.5/weather',
             data: {q: query},
@@ -289,12 +289,12 @@
 </pre>
 <p>We expect this feature to tie the two previous features together. So we expect something like this to happen, the "then"-part:</p>
 <pre>
-    expect(fetch).toHaveBeenCalledWith('San Francisco');
-    expect(render).toHaveBeenCalledWith(context, { text: 'foggy' });
+    expect(Weather.fetch).toHaveBeenCalledWith('San Francisco');
+    expect(Weather.render).toHaveBeenCalledWith(context, { text: 'foggy' });
 </pre>
 <p>The trigger of this will be that the user has changed an input value, so let's add this to the "when"-part:</p>
 <pre>
-    listen(context);
+    Weather.listen(context);
     city.val('San Francisco');
     city.trigger('change');
 </pre>
@@ -306,20 +306,20 @@
 <p>This is a unit test, so we don't actually want to invoke the fetch() and render() methods. Instead we use Jasmine to mock these methods, which also allows us to spy on them in the "then"-part.</p>
 <p>Note that mocking promises (then-ables) are not built into Jasmine, so we have to write a bit of boilerplate for that ourselves in the "given"-section:</p>
 <pre>
-    spyOn(window, 'fetch').and.returnValue({
+    spyOn(Weather, 'fetch').and.returnValue({
         then: function(callback) {
             callback({text: 'foggy'});
         }
     });
-    spyOn(window, 'render').and.returnValue();
+    spyOn(Weather, 'render').and.returnValue();
 </pre>
 <p>Now that we have a failing test, we can implement the code in "weather.js" to make the test pass:</p>
 <pre>
-    function listen(context) {
+    Weather.listen = function (context) {
         context.find('#city').on('change', function () {
             var city = $(this);
-            fetch(city.val()).then(function (data) {
-                render(context, data);
+            Weather.fetch(city.val()).then(function (data) {
+                Weather.render(context, data);
             })
         })
     }
@@ -333,7 +333,7 @@
 </pre>
 <p>And call our new listen() method in onload:</p>
 <pre>
-    &lt;body onload="listen($('body'))">
+    &lt;body onload="Weather.listen($('body'))">
 </pre>
 <p>And get weather reports :)</p>
 </body>

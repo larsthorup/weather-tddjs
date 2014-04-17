@@ -1,8 +1,10 @@
-function render(context, data) {
-    $('<p></p>').appendTo(context).text(data.text);
-}
+Weather = {};
 
-function fetch(query) {
+Weather.render = function (context, data) {
+    $('<p></p>').appendTo(context).text(data.text);
+};
+
+Weather.fetch = function (query) {
     if(false) {
         return {
             then: function (callback) {
@@ -63,13 +65,13 @@ function fetch(query) {
             text: data.weather[0].description
         };
     });
-}
+};
 
-function listen(context) {
+Weather.listen = function (context) {
     context.find('#city').on('change', function () {
         var city = $(this);
-        fetch(city.val()).then(function (data) {
-            render(context, data);
+        Weather.fetch(city.val()).then(function (data) {
+            Weather.render(context, data);
         })
     })
-}
+};
