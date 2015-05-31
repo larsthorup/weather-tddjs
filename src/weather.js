@@ -5,13 +5,11 @@ Weather.render = function (context, data) {
 };
 
 Weather.fetch = function (query) {
-    if(false) {
-        return {
-            then: function (callback) {
-                callback({text: 'sunny'});
-            }
-        };
-    }
+    //return {
+    //    then: function (callback) {
+    //        callback({text: 'sunny'});
+    //    }
+    //};
 
     // sample response:
     //
