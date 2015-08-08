@@ -21,8 +21,8 @@
   "homepage": "https://github.com/larsthorup/weather-tddjs",
   "devDependencies": {
     "grunt": "^0.4.4",
-    "grunt-contrib-jasmine": "^0.8.1",
-    "grunt-template-jasmine-istanbul": "^0.3.0",
-    "coveralls": "^2.11.1"
+    "grunt-contrib-jasmine": "^0.9.1",
+    "grunt-template-jasmine-istanbul": "^0.3.4",
+    "coveralls": "^2.11.3"
   }
 }
