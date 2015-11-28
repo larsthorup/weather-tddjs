@@ -22,7 +22,7 @@
   "devDependencies": {
     "grunt": "^0.4.4",
     "grunt-contrib-jasmine": "^0.9.1",
-    "grunt-template-jasmine-istanbul": "^0.3.4",
+    "grunt-template-jasmine-istanbul": "^0.4.0",
     "coveralls": "^2.11.3"
   }
 }
